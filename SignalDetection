@@ -1,0 +1,55 @@
+import unittest
+import numpy as np
+import scipy as spi
+
+class SignalDetection:
+    def __init__(self, hits, misses, false_alarms, correct_rejections):
+        self.hits = hits
+        self.misses = misses
+        self.false_alarms = false_alarms
+        self.correct_rejections = correct_rejections
+    
+    def H(self, hits, misses):
+        return (hits / (hits + misses))
+
+    def FA(self, false_alarms, correct_rejections):
+        return (false_alarms / (false_alarms + correct_rejections))
+
+    def d_prime(self):
+        return (spi.stats.norm.ppf(self.H(self.hits, self.misses)) - spi.stats.norm.ppf(self.FA(self.false_alarms, self.correct_rejections)))
+
+    def criterion(self):
+        return ((-0.5) * (spi.stats.norm.ppf(self.H(self.hits, self.misses)) + spi.stats.norm.ppf(self.FA(self.false_alarms, self.correct_rejections))))
+
+
+class TestSignalDetection(unittest.TestCase):
+    def test_d_prime_zero(self):
+        sd   = SignalDetection(15, 5, 15, 5)
+        expected = 0
+        obtained = sd.d_prime()
+        # Compare calculated and expected d-prime
+        self.assertAlmostEqual(obtained, expected, places=6)
+    def test_d_prime_nonzero(self):
+        sd   = SignalDetection(15, 10, 15, 5)
+        expected = -0.421142647060282
+        obtained = sd.d_prime()
+        # Compare calculated and expected d-prime
+        self.assertAlmostEqual(obtained, expected, places=6)
+    def test_criterion_zero(self):
+        sd   = SignalDetection(5, 5, 5, 5)
+        # Calculate expected criterion        
+        expected = 0
+        obtained = sd.criterion()
+        # Compare calculated and expected criterion
+        self.assertAlmostEqual(obtained, expected, places=6)
+    def test_criterion_nonzero(self):
+        sd   = SignalDetection(15, 10, 15, 5)
+        # Calculate expected criterion        
+        expected = -0.463918426665941
+        obtained = sd.criterion()
+        # Compare calculated and expected criterion
+        self.assertAlmostEqual(obtained, expected, places=6)
+
+
+if __name__ == '__main__':
+    unittest.main()
