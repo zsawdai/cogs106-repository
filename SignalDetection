@@ -1,22 +1,22 @@
 import unittest
-import numpy as np
 import scipy as spi
 
 class SignalDetection:
+    
     def __init__(self, hits, misses, false_alarms, correct_rejections):
         self.hits = hits
         self.misses = misses
         self.false_alarms = false_alarms
         self.correct_rejections = correct_rejections
     
-    def H(self, hits, misses):
-        return (hits / (hits + misses))
+    def H(self):
+        return (self.hits / (self.hits + self.misses))
 
-    def FA(self, false_alarms, correct_rejections):
-        return (false_alarms / (false_alarms + correct_rejections))
+    def FA(self):
+        return (self.false_alarms / (self.false_alarms + self.correct_rejections))
 
     def d_prime(self):
-        return (spi.stats.norm.ppf(self.H(self.hits, self.misses)) - spi.stats.norm.ppf(self.FA(self.false_alarms, self.correct_rejections)))
+        return (spi.stats.norm.ppf(self.H()) - spi.stats.norm.ppf(self.FA()))
 
     def criterion(self):
-        return ((-0.5) * (spi.stats.norm.ppf(self.H(self.hits, self.misses)) + spi.stats.norm.ppf(self.FA(self.false_alarms, self.correct_rejections))))
+        return ((-0.5) * (spi.stats.norm.ppf(self.H()) + spi.stats.norm.ppf(self.FA())))
