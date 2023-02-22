@@ -20,3 +20,39 @@ class SignalDetection:
 
     def criterion(self):
         return ((-0.5) * (spi.stats.norm.ppf(self.H()) + spi.stats.norm.ppf(self.FA())))
+
+class TestSignalDetection(unittest.TestCase):
+
+    def test_d_prime_zero(self):
+        sd   = SignalDetection(15, 5, 15, 5)
+        expected = 0
+        obtained = sd.d_prime()
+        self.assertAlmostEqual(obtained, expected, places=6)
+
+    def test_d_prime_nonzero(self):
+        sd   = SignalDetection(15, 10, 15, 5)
+        expected = -0.421142647060282
+        obtained = sd.d_prime()
+        self.assertAlmostEqual(obtained, expected, places=6)
+
+    def test_criterion_zero(self):
+        sd   = SignalDetection(5, 5, 5, 5)   
+        expected = 0
+        obtained = sd.criterion()
+        self.assertAlmostEqual(obtained, expected, places=6)
+
+    def test_criterion_nonzero(self):
+        sd   = SignalDetection(15, 10, 15, 5)
+        expected = -0.463918426665941
+        obtained = sd.criterion()
+        self.assertAlmostEqual(obtained, expected, places=6)
+
+    def test_d_prime_corruption(self):
+        sd   = SignalDetection(15, 5, 15, 5)
+        obtained_1 = sd.d_prime()
+        sd.hits = 15
+        sd.misses = 10
+        sd.false_alarms = 15
+        sd.correct_rejections = 5
+        obtained_2 = sd.d_prime()
+        self.assertNotEqual(obtained_1, obtained_2)
