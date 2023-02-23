@@ -1,5 +1,7 @@
 import unittest
 import scipy as spi
+import matplotlib.pyplot as plt
+import numpy as np
 
 class SignalDetection:
     
@@ -26,7 +28,7 @@ class SignalDetection:
     
     def __mul__(self, scalar):
         return SignalDetection(self.hits * scalar, self.misses * scalar, self.false_alarms * scalar, self.correct_rejections * scalar)
-       
+
     def plot_roc(self):
         plt.plot(0,0, 'o', color = 'black')
         plt.plot(1,1, 'o', color = 'black')
@@ -50,6 +52,24 @@ class SignalDetection:
         x.append(1)
         y.append(1)
         plt.plot(x,y, '-')
+
+    def plot_sdt(self):
+        noise_x = np.arange(-4, 4, 0.1)
+        noise_y = spi.stats.norm.pdf(noise_x, 0, 1)
+        signal_x = np.arange(-4, 4, 0.1)
+        signal_y = spi.stats.norm.pdf(noise_x, self.d_prime(), 1)
+        plt.plot(noise_x, noise_y, label = "Noise", color = 'blue')
+        plt.plot(signal_x, signal_y, label = "Signal", color = 'green')
+        plt.axvline(x = ((self.d_prime() / 2) + self.criterion()), label = "k", color = 'r', linestyle = '--')
+        x_distance = [0, self.d_prime()]
+        y_distance = [0.4, 0.4]
+        plt.plot(x_distance, y_distance, '--', label = "Distance", color = 'black')
+        plt.plot(0,0, 'o', label = '0', color = 'blue')
+        plt.plot(self.d_prime(), 0, 'o', label = 'D\'', color = 'green')
+        plt.title("Signal Detection Theory Curve")
+        plt.xlabel("Response")
+        plt.ylabel("Probability")
+        plt.legend()
 
 class TestSignalDetection(unittest.TestCase):
 
