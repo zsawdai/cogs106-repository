@@ -26,6 +26,30 @@ class SignalDetection:
     
     def __mul__(self, scalar):
         return SignalDetection(self.hits * scalar, self.misses * scalar, self.false_alarms * scalar, self.correct_rejections * scalar)
+       
+    def plot_roc(self):
+        plt.plot(0,0, 'o', color = 'black')
+        plt.plot(1,1, 'o', color = 'black')
+        plt.xlim([0,1])
+        plt.ylim([0,1])
+        plt.xlabel("False Alarm Rate")
+        plt.ylabel("Hit Rate")
+        plt.title("Receiver Operating Characteristic Curve")
+        x = [0]
+        y = [0]
+        if isinstance(self, list):
+            for i in range(len(self)):
+                s = self(i)
+                x.append(s.FA())
+                y.append(s.H())
+                plt.plot(s.FA(), s.H(), 'o', color = 'black')
+        else:
+            x.append(self.FA())
+            y.append(self.H())
+            plt.plot(self.FA(), self.H(), 'o', color = 'black')
+        x.append(1)
+        y.append(1)
+        plt.plot(x,y, '-')
 
 class TestSignalDetection(unittest.TestCase):
 
