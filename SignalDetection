@@ -52,6 +52,7 @@ class SignalDetection:
         x.append(1)
         y.append(1)
         plt.plot(x,y, '-')
+        plt.show()
 
     def plot_sdt(self):
         noise_x = np.arange(-4, 4, 0.1)
@@ -70,6 +71,7 @@ class SignalDetection:
         plt.xlabel("Response")
         plt.ylabel("Probability")
         plt.legend()
+        plt.show()
 
 class TestSignalDetection(unittest.TestCase):
 
