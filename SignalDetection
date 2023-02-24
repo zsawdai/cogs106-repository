@@ -39,16 +39,9 @@ class SignalDetection:
         plt.title("Receiver Operating Characteristic Curve")
         x = [0]
         y = [0]
-        if isinstance(self, list):
-            for i in range(len(self)):
-                s = self(i)
-                x.append(s.FA())
-                y.append(s.H())
-                plt.plot(s.FA(), s.H(), 'o', color = 'black')
-        else:
-            x.append(self.FA())
-            y.append(self.H())
-            plt.plot(self.FA(), self.H(), 'o', color = 'black')
+        x.append(self.FA())
+        y.append(self.H())
+        plt.plot(self.FA(), self.H(), 'o', color = 'black')
         x.append(1)
         y.append(1)
         plt.plot(x,y, '-')
