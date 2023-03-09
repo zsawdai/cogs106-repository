@@ -95,3 +95,12 @@ class SignalDetection:
         plt.plot(np.linspace(0,1,100), losscurve, '-', color='red')
         aHat = minimize.x
         return float(aHat)
+
+    @staticmethod
+    def rocLoss(a, sdtList):
+        L = []
+        for i in range(len(sdtList)):
+            s = sdtList[i]
+            predicted_hit_rate = s.rocCurve(s.FA(), a)
+            L.append(s.nLogLikelihood(predicted_hit_rate, s.FA()))
+        return sum(L)
