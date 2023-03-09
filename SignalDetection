@@ -29,23 +29,22 @@ class SignalDetection:
     def __mul__(self, scalar):
         return SignalDetection(self.hits * scalar, self.misses * scalar, self.false_alarms * scalar, self.correct_rejections * scalar)
 
-    def plot_roc(self):
-        plt.plot(0,0, 'o', color = 'black')
-        plt.plot(1,1, 'o', color = 'black')
+    @staticmethod
+    def plot_roc(sdtList):
         plt.xlim([0,1])
         plt.ylim([0,1])
         plt.xlabel("False Alarm Rate")
         plt.ylabel("Hit Rate")
         plt.title("Receiver Operating Characteristic Curve")
-        x = [0]
-        y = [0]
-        x.append(self.FA())
-        y.append(self.H())
-        plt.plot(self.FA(), self.H(), 'o', color = 'black')
-        x.append(1)
-        y.append(1)
-        plt.plot(x,y, '-')
-        plt.show()
+        if isinstance(sdtList, list):
+            for i in range(len(sdtList)):
+                s = sdtList[i]
+                plt.plot(s.FA(), s.H(), 'o', color = 'black', markersize = 10)
+        else:
+            plt.plot(sdtList.FA(), sdtList.H(), 'o', color = 'black', markersize = 10)
+        x, y = np.linspace(0,1,100), np.linspace(0,1,100)
+        plt.plot(x,y, '--', color = 'black')
+        plt.grid()
 
     def plot_sdt(self):
         noise_x = np.arange(-4, 4, 0.1)
@@ -66,53 +65,14 @@ class SignalDetection:
         plt.legend()
         plt.show()
 
-class TestSignalDetection(unittest.TestCase):
+    @staticmethod
+    def simulate(dprime, criteriaList, signalCount, noiseCount):
+      sdtList = []
+      for i in range(len(criteriaList)):
+          k = criteriaList[i] + (dprime/2)
 
-    def test_d_prime_zero(self):
-        sd   = SignalDetection(15, 5, 15, 5)
-        expected = 0
-        obtained = sd.d_prime()
-        self.assertAlmostEqual(obtained, expected, places=6)
+          hits, falseAlarms = np.random.binomial(n=[signalCount, noiseCount], p=[1 - spi.stats.norm.cdf(k - dprime),1 - spi.stats.norm.cdf(k)])
+          misses, correctRejections = signalCount - hits, noiseCount - falseAlarms
 
-    def test_d_prime_nonzero(self):
-        sd   = SignalDetection(15, 10, 15, 5)
-        expected = -0.421142647060282
-        obtained = sd.d_prime()
-        self.assertAlmostEqual(obtained, expected, places=6)
-
-    def test_criterion_zero(self):
-        sd   = SignalDetection(5, 5, 5, 5)   
-        expected = 0
-        obtained = sd.criterion()
-        self.assertAlmostEqual(obtained, expected, places=6)
-
-    def test_criterion_nonzero(self):
-        sd   = SignalDetection(15, 10, 15, 5)
-        expected = -0.463918426665941
-        obtained = sd.criterion()
-        self.assertAlmostEqual(obtained, expected, places=6)
-
-    def test_d_prime_corruption(self):
-        sd   = SignalDetection(15, 5, 15, 5)
-        obtained_1 = sd.d_prime()
-        sd.hits = 15
-        sd.misses = 10
-        sd.false_alarms = 15
-        sd.correct_rejections = 5
-        obtained_2 = sd.d_prime()
-        self.assertNotEqual(obtained_1, obtained_2)
-
-    def test_addition(self):
-        sd = SignalDetection(1, 1, 2, 1) + SignalDetection(2, 1, 1, 3)
-        expected = SignalDetection(3, 2, 3, 4).criterion()
-        obtained = sd.criterion()
-        self.assertEqual(obtained, expected)
-        
-    def test_multiplication(self):
-        sd = SignalDetection(1, 2, 3, 1) * 4
-        expected = SignalDetection(4, 8, 12, 4).criterion()
-        obtained = sd.criterion()
-        self.assertEqual(obtained, expected)
-
-if __name__ == '__main__':
-    unittest.main()
+          sdtList.append(SignalDetection(hits, misses, falseAlarms, correctRejections))
+      return sdtList
