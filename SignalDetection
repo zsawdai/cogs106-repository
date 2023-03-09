@@ -83,3 +83,15 @@ class SignalDetection:
     @staticmethod
     def rocCurve(falseAlarmRate, a):
         return spi.stats.norm.cdf(a + spi.stats.norm.ppf((falseAlarmRate)))
+
+    @staticmethod
+    def fit_roc(sdtList):
+        SignalDetection.plot_roc(sdtList)
+        a = 0
+        minimize = spi.optimize.minimize(fun = SignalDetection.rocLoss, x0 = a, method = 'nelder-mead', args = (sdtList))
+        losscurve = []
+        for i in range(0,100,1):
+          losscurve.append((SignalDetection.rocCurve(i/100, float(minimize.x))))
+        plt.plot(np.linspace(0,1,100), losscurve, '-', color='red')
+        aHat = minimize.x
+        return float(aHat)
