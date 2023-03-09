@@ -76,3 +76,6 @@ class SignalDetection:
 
           sdtList.append(SignalDetection(hits, misses, falseAlarms, correctRejections))
       return sdtList
+
+    def nLogLikelihood(self, hit_rate, false_alarm_rate):
+        return -((self.hits * np.log(hit_rate)) + (self.misses * np.log(1-hit_rate)) + (self.false_alarms * np.log(false_alarm_rate)) + (self.correct_rejections * np.log(1-false_alarm_rate)))
