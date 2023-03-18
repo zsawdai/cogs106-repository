@@ -10,9 +10,9 @@ class Metropolis:
         self.sDevK = None
         
     def __accept(self, proposal, current):
-        acceptanceProb = min(1, (np.exp(self.logTarget(proposal) - self.logTarget(current))))
+        acceptanceProb = min(0, (self.logTarget(proposal) - self.logTarget(current)))
         u = (np.random.uniform(0,1))
-        if acceptanceProb > u:
+        if np.exp(acceptanceProb) > u:
             return True
         else:
             return False
